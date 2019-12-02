@@ -1,3 +1,7 @@
 # mockups
 /markup
 /mockups
+
+# dependencies
+/api/node_modules
+/client/node_modules
