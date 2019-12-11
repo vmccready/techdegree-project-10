@@ -1,16 +1,14 @@
 import React from 'react';
-import Data from '../Data';
 
 export default class Index extends React.Component {
-  
+
+
   render() {
-
-    const data = new Data();
-    async {const courses = await data.getCourses(); }
-
+    const { courses } = this.props.context.courses;
 
     console.log(courses);
 
+    console.log(this.temp);
     return (
       <div id="root">
         <div>

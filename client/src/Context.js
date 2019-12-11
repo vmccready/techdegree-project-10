@@ -1,11 +1,12 @@
 import React from 'react';
+import Data from './Data';
 
 const Context = React.createContext();
 
-export class Provider extends Comonent {
+export class Provider extends React.Component {
 
   state = {
-
+    courses: [],
   };
 
   constructor() {
@@ -14,8 +15,13 @@ export class Provider extends Comonent {
   }
 
   render() {
+    const { courses } = this.state;
     const value = {
+      courses: courses,
       data: this.data,
+      actions: {
+        getCourses: this.getCourses,
+      },
     }
 
     return (
@@ -24,6 +30,20 @@ export class Provider extends Comonent {
       </Context.Provider>
     )
   }
+
+  getCourses = async() => {
+    const courses = await this.data.getCourses();
+    if (courses !== null) {
+      this.setState( ()=> {
+        return {
+          courses: courses,
+        };
+      });
+    }
+    return courses;
+  }
+
+
 }
 
 export const Consumer = Context.Consumer;
@@ -39,7 +59,7 @@ export default function withContext(Component) {
   return function ContextComponent(props) {
     return (
       <Context.Consumer>
-        {context => <Component {...props} context={context} />}
+        {context => <Component {...props} context={context} temp={10} />}
       </Context.Consumer>
     );
   }
