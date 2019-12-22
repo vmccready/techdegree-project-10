@@ -6,7 +6,6 @@ const Context = React.createContext();
 export class Provider extends React.Component {
 
   state = {
-    courses: [],
   };
 
   constructor() {
@@ -15,12 +14,10 @@ export class Provider extends React.Component {
   }
 
   render() {
-    const { courses } = this.state;
+
     const value = {
-      courses: courses,
       data: this.data,
       actions: {
-        getCourses: this.getCourses,
       },
     }
 
@@ -31,17 +28,31 @@ export class Provider extends React.Component {
     )
   }
 
-  getCourses = async() => {
-    const courses = await this.data.getCourses();
-    if (courses !== null) {
-      this.setState( ()=> {
-        return {
-          courses: courses,
-        };
-      });
-    }
-    return courses;
-  }
+  // getCourses = async() => {
+  //   const courses = await this.data.getCourses();
+  //   if (courses !== null) {
+  //     this.setState( ()=> {
+  //       return {
+  //         courses: courses,
+  //       };
+  //     });
+  //   }
+  //   return courses;
+  // }
+
+  // getCourseDetail = async(id) => {
+  //   this.setState({ loading: true });
+  //   const courseDetail = await this.data.getCourseDetail(id);
+  //   if (courseDetail !== null) {
+  //     this.setState( ()=> {
+  //       return {
+  //         courseDetail: courseDetail,
+  //         loading: false
+  //       };
+  //     });
+  //   }
+  //   return courseDetail;
+  // }
 
 
 }

@@ -15,7 +15,23 @@ export default class Header extends React.PureComponent {
         <link href="https://fonts.googleapis.com/css?family=Cousine" rel="stylesheet" type="text/css" />
         {/* <link href="../styles/global.css" rel="stylesheet" /> */}
         <title>Courses</title>
+
+        <div className="header">
+          <div className="bounds">
+            <h1 className="header--logo">Courses</h1>
+            <nav><span>Welcome Joe Smith!</span><a className="signout" href="index.html">Sign Out</a></nav>
+          </div>
+        </div>
+        <hr />
+        {/* <div className="header">
+          <div className="bounds">
+            <h1 className="header--logo">Courses</h1>
+            <nav><a className="signup" href="sign-up.html">Sign Up</a><a className="signin" href="sign-in.html">Sign In</a></nav>
+          </div>
+        </div>
+        <hr /> */}
       </div>
+      
     );
   }
 }
