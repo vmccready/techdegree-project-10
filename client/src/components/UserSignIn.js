@@ -62,6 +62,25 @@ export default class UserSignIn extends React.Component {
   handleSubmit = (event) => {
     //don't submit and reload page
     event.preventDefault();
+    const { context } = this.props;
+    const { from } = this.props.location.state || { from: { pathname: '/courses' } };
+    const { password } = this.state;
+    const username = this.state.emailAddress;
+
+    context.actions.signIn(username, password)
+      .then((user) => {
+        if (user === null) {
+          this.setState(() => {
+            return { errors: [ 'Sign-in was unsuccessful' ] };
+          });
+        } else {
+          this.props.history.push('/courses');
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        this.props.history.push('/error');
+      });
 
 
   };
