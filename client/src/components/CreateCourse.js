@@ -1,5 +1,6 @@
 import React from 'react';
 import Data from '../Data';
+import { Link } from 'react-router-dom';
 
 export default class CreateCourse extends React.Component {
 
@@ -8,6 +9,7 @@ export default class CreateCourse extends React.Component {
     description: "",
     estimatedTime: "",
     materialsNeeded: "",
+    errors: [],
     loading: true
   };
 
@@ -20,6 +22,7 @@ export default class CreateCourse extends React.Component {
 
   render() {
     const { title, description, estimatedTime, materialsNeeded } = this.state;
+    const currentUser = this.props.context.authenticatedUser;
 
     return(
       <div>
@@ -27,16 +30,17 @@ export default class CreateCourse extends React.Component {
         <div className="bounds course--detail">
           <h1>Create Course</h1>
           <div>
-            <div>
-              <h2 className="validation--errors--label">Validation errors</h2>
-              <div className="validation-errors">
-                <ul>
-                  <li>Please provide a value for "Title"</li>
-                  <li>Please provide a value for "Description"</li>
-                </ul>
+            { (this.state.errors?.length > 0) &&
+              <div>
+                <h2 className="validation--errors--label">Validation errors</h2>
+                <div className="validation-errors">
+                  <ul>
+                    {this.state.errors.map((error, i)=> <li key={i}>{error}</li>)}
+                  </ul>
+                </div>
               </div>
-            </div>
-            <form>
+            }
+            <form onSubmit={this.handleSubmit}>
               <div className="grid-66">
                 <div className="course--header">
                   <h4 className="course--label">Course</h4>
@@ -49,7 +53,7 @@ export default class CreateCourse extends React.Component {
                     onChange={this.change}
                     placeholder="Course title..." /></div>
                     {/* Use user's name */}
-                  <p>By Joe Smith</p>
+                  <p>{`By ${currentUser.firstName} ${currentUser.lastName}`}</p>
                 </div>
                 <div className="course--description">
                   <div><textarea 
@@ -86,7 +90,10 @@ export default class CreateCourse extends React.Component {
                   </ul>
                 </div>
               </div>
-              <div className="grid-100 pad-bottom"><button className="button" type="submit">Create Course</button><button className="button button-secondary" onclick="event.preventDefault(); location.href='index.html';">Cancel</button></div>
+              <div className="grid-100 pad-bottom">
+                <button className="button" type="submit">Create Course</button>
+                <Link className="button button-secondary" to={`/`}>Cancel</Link>
+              </div>
             </form>
           </div>
         </div>
@@ -106,4 +113,31 @@ export default class CreateCourse extends React.Component {
       }
     })
   }
+
+  handleSubmit =  (event) => {
+    //don't submit and reload page
+    event.preventDefault();
+    const { context } = this.props;
+
+    const { title, description, estimatedTime, materialsNeeded } = this.state;
+    const course = {title, description, estimatedTime, materialsNeeded};
+    
+    context.actions.createCourse(course)
+      .then( (response) => {
+        if(response.status === 201) {
+          this.props.history.push('/');
+        } else if (response.status ===400){
+          response.json().then(data => {
+            this.setState(() => {
+              return {errors: data.message }
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        this.props.history.push('/error');
+      });
+  };
+
 }

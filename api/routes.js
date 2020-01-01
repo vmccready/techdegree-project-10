@@ -28,9 +28,10 @@ const userValidators = [
   check('lastName')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "last name"'),
-  check('emailAddress')
-    .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "email address"'),
+    // email is validated in emailValidator
+  // check('emailAddress')
+  //   .exists({ checkNull: true, checkFalsy: true })
+  //   .withMessage('Please provide a value for "email address"'),
   check('password')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "password"'),
@@ -44,6 +45,10 @@ function validateEmail(email) {
   return re.test(email);
 }
 const emailValidator = body('emailAddress').custom( email => {
+
+  if (email === undefined) {
+    return Promise.reject('Please provide a value for "email address"');
+  }
   // See if email already used
   return User.findOne({
     where: { emailAddress: email.toLowerCase() }
@@ -61,10 +66,10 @@ const emailValidator = body('emailAddress').custom( email => {
 const courseValidators = [
   check('title')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "first name"'),
+    .withMessage('Please provide a value for "title"'),
   check('description')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "last name"'),
+    .withMessage('Please provide a value for "description"'),
 ];
 
 // Authenticate user
@@ -114,9 +119,7 @@ router.get('/users', authenticateUser, (req, res) => {
   const user = req.currentUser;
 
   // Send user data
-  res.json({
-    name: `${user.firstName} ${user.lastName}`,
-  });
+  res.json(user);
 });
 
 // Create user

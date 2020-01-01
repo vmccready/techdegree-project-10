@@ -8,6 +8,8 @@ import {
 import './App.css';
 
 import withContext from './Context';
+import PrivateRoute from './PrivateRoute';
+
 import Header from './components/Header';
 import Courses from './components/Courses';
 import CourseDetail from './components/CourseDetail';
@@ -16,24 +18,28 @@ import UserSignUp from './components/UserSignUp';
 import UserSignOut from './components/UserSignOut';
 import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
-//const IndexWithContext = Context.withContext(Index);
+
 const HeaderWithContext = withContext(Header);
 const UserSignInWithContext = withContext(UserSignIn);
 const UserSignOutWithContext = withContext(UserSignOut);
+const UserSignUpWithContext = withContext(UserSignUp);
+// const CoursesWithContext = withContext(Courses);
+const CreateCourseWithContext = withContext(CreateCourse);
 const CourseDetailWithContext = withContext(CourseDetail);
+const UpdateCourseWithContext = withContext(UpdateCourse);
 
 export default ()=> (
   <Router>
       <div id="root">
         <HeaderWithContext />
         <Switch>
-          <Route exact path="/courses" component={Courses} />
-          <Route path="/course/:id" component={CourseDetail} />
+          <Route exact path="/" component={Courses} />
+          <Route path="/course/:id" component={CourseDetailWithContext} />
           <Route path="/signin" component={UserSignInWithContext} />
-          <Route path="/signup" component={UserSignUp} />
+          <Route path="/signup" component={UserSignUpWithContext} />
           <Route path="/signout" component={UserSignOutWithContext} />
-          <Route path="/courses/create" component={CreateCourse} />
-          <Route path="/courses/update/:id" component={UpdateCourse} />
+          <PrivateRoute path="/courses/create" component={CreateCourseWithContext} />
+          <PrivateRoute path="/courses/:id/update" component={UpdateCourseWithContext} />
         </Switch>
       </div>
   </Router>

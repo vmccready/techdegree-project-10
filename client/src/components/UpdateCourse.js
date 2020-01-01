@@ -8,6 +8,8 @@ export default class UpdateCourse extends React.Component {
     description: "",
     estimatedTime: "",
     materialsNeeded: "",
+    courseId: "",
+    errors: [],
     loading: true
   };
 
@@ -29,6 +31,7 @@ export default class UpdateCourse extends React.Component {
           description: courseDetail.description,
           estimatedTime: courseDetail.estimatedTime,
           materialsNeeded: courseDetail.materialsNeeded,
+          courseId: courseDetail.id,
           loading:false
         };
       });
@@ -43,17 +46,17 @@ export default class UpdateCourse extends React.Component {
       <div className="bounds course--detail">
         <h1>Update Course</h1>
         <div>
-          {/* Possible Validation Errors */}
-          <div>
-            <h2 className="validation--errors--label">Validation errors</h2>
-            <div className="validation-errors">
-              <ul>
-                <li>Please provide a value for "Title"</li>
-                <li>Please provide a value for "Description"</li>
-              </ul>
+          { (this.state.errors?.length > 0) &&
+            <div>
+              <h2 className="validation--errors--label">Validation errors</h2>
+              <div className="validation-errors">
+                <ul>
+                  {this.state.errors.map((error, i)=> <li key={i}>{error}</li>)}
+                </ul>
+              </div>
             </div>
-          </div>
-          <form>
+          }
+          <form onSubmit={this.handleSubmit}>
             <div className="grid-66">
               <div className="course--header">
                 <h4 className="course--label">Course</h4>
@@ -103,7 +106,10 @@ export default class UpdateCourse extends React.Component {
                 </ul>
               </div>
             </div>
-            <div className="grid-100 pad-bottom"><button className="button" type="submit">Update Course</button><button className="button button-secondary" onclick="event.preventDefault(); location.href='course-detail.html';">Cancel</button></div>
+            <div className="grid-100 pad-bottom">
+              <button className="button" type="submit">Update Course</button>
+              <button className="button button-secondary" onClick={this.handleCancel}>Cancel</button>
+            </div>
           </form>
         </div>
       </div>
@@ -111,6 +117,41 @@ export default class UpdateCourse extends React.Component {
     )
     
   }
+
+  handleSubmit =  (event) => {
+    //don't submit and reload page
+    event.preventDefault();
+    const { context } = this.props;
+
+    const { title, description, estimatedTime, materialsNeeded } = this.state;
+    const course = {title, description, estimatedTime, materialsNeeded};
+    const id = this.state.courseId;
+
+    context.actions.updateCourse(id, course)
+      .then( (response) => {
+        if(response.status === 204) {
+          this.props.history.push(`/course/${this.props.match.params.id}`);
+        } 
+        else if (response.status === 400) {
+          response.json().then(data => {
+            this.setState(() => {
+              return {errors: data.message }
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        this.props.history.push('/error');
+      });
+  };
+
+  handleCancel = (event) => {
+    //don't submit and reload page
+    event.preventDefault();
+    this.props.history.push(`/course/${this.props.match.params.id}`)
+
+  };
 
   change = (event) => { 
     const name = event.target.name;

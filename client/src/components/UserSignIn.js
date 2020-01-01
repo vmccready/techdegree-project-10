@@ -11,15 +11,10 @@ export default class UserSignIn extends React.Component {
     errors: [],
   }
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
       username,
       password,
-      errors,
     } = this.state;
 
     return (
@@ -47,11 +42,11 @@ export default class UserSignIn extends React.Component {
                           onChange={this.change}
                           placeholder="Password" 
                           /></div>
-                  <div className="grid-100 pad-bottom"><button className="button" type="submit">Sign In</button><button className="button button-secondary" onClick={this.handleCancel}>Cancel</button></div>
+                  <div className="grid-100 pad-bottom"><button className="button" type="submit">Sign In</button><Link className="button button-secondary" to='/'>Cancel</Link></div>
                 </form>
               </div>
               <p>&nbsp;</p>
-              <p>Don't have a user account? <a href="sign-up.html">Click here</a> to sign up!</p>
+              <p>Don't have a user account? <Link to='/signup'>Click here</Link> to sign up!</p>
             </div>
           </div>
         </div>
@@ -63,10 +58,11 @@ export default class UserSignIn extends React.Component {
     //don't submit and reload page
     event.preventDefault();
     const { context } = this.props;
-    const { from } = this.props.location.state || { from: { pathname: '/courses' } };
     const { password } = this.state;
     const username = this.state.emailAddress;
 
+    console.log(username);
+    console.log(password);
     context.actions.signIn(username, password)
       .then((user) => {
         if (user === null) {
@@ -74,20 +70,13 @@ export default class UserSignIn extends React.Component {
             return { errors: [ 'Sign-in was unsuccessful' ] };
           });
         } else {
-          this.props.history.push('/courses');
+          this.props.history.push('/');
         }
       })
       .catch((error) => {
         console.error(error);
         this.props.history.push('/error');
       });
-
-
-  };
-
-  handleCancel = (event) => {
-    //don't submit and reload page
-    event.preventDefault();
 
 
   };
