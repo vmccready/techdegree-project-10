@@ -1,10 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-
-
 export default class UserSignUp extends React.Component {
 
+  // initialize state and values
   state = {
     firstName: '',
     lastName: '',
@@ -31,6 +30,7 @@ export default class UserSignUp extends React.Component {
             <div className="grid-33 centered signin">
               <h1>Sign In</h1>
               <div>
+                {/* Show validation errors */}
                 { (this.state.errors?.length > 0) &&
                   <div>
                     <h2 className="validation--errors--label">Validation errors</h2>
@@ -100,13 +100,17 @@ export default class UserSignUp extends React.Component {
     const { firstName, lastName, emailAddress, password, confirmPassword } = this.state;
     const user = {firstName, lastName, emailAddress, password};
 
+    // make sure passwords match
     if (password === confirmPassword) {
+      // use context signup
       context.actions.signUp(user)
         .then( (response) => {
           if(response.status === 201) {
+            // send to home page if success
             this.props.history.push('/');
           }
           else if (response.status === 400) {
+            // load validation errors
             response.json().then(data => {
               this.setState(() => {
                 return { errors: data.message }
@@ -133,6 +137,7 @@ export default class UserSignUp extends React.Component {
 
   };
 
+  // change values when user inputs
   change = (event) => { 
     const name = event.target.name;
     const value = event.target.value;

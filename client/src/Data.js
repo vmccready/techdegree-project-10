@@ -1,6 +1,7 @@
 
-
 export default class Data {
+
+  // api function to fetch data
   api(path, method = 'GET', body = null, requiresAuth = false, credentials = null) {
     // Link to host api
     const url = 'http://localhost:5000/api' + path;
@@ -13,11 +14,13 @@ export default class Data {
       body,
     };
 
+    //include credentials if authorization required
     if (requiresAuth) {    
       const encodedCredentials = btoa(`${credentials.username}:${credentials.password}`);
       options.headers['Authorization'] = `Basic ${encodedCredentials}`;
     }
 
+    //fetch data
     return fetch(url, options);
   }
 

@@ -7,8 +7,8 @@ const Context = React.createContext();
 export class Provider extends React.Component {
 
   state = {
+    // get authenticated user from cookies, or null
     authenticatedUser: Cookies.getJSON('authenticatedUser') || null,
-    deleting: false,
   };
 
   constructor() {
@@ -17,10 +17,11 @@ export class Provider extends React.Component {
   }
 
   render() {
-    const { authenticatedUser, deleting } = this.state;
+    const { authenticatedUser } = this.state;
+
+    // values for context
     const value = {
       authenticatedUser,
-      deleting,
       data: this.data,
       actions: {
         signIn: this.signIn,
@@ -32,6 +33,7 @@ export class Provider extends React.Component {
       },
     }
 
+    // pass values to context provider
     return (
       <Context.Provider value={value}>
         {this.props.children}
@@ -40,17 +42,23 @@ export class Provider extends React.Component {
   }
 
   signIn = async (username, password) => {
+    // get user from database
     const user = await this.data.getUser(username, password);
+
+    // store if user exists
     if (user !== null) {
       this.setState(() => {
         return {
           authenticatedUser: user,
         };
       });
+
+      //save user in cookie
       const cookieOptions = {
         expires: 1 // 1 day
       };
-      // save unhashed password to state
+
+      // save unhashed password to state for future use
       user.password = password;
       Cookies.set('authenticatedUser', user, cookieOptions);
     }
@@ -58,6 +66,7 @@ export class Provider extends React.Component {
   }
 
   signOut = () => {
+    // remove user from state and cookie
     this.setState({ authenticatedUser: null });
     Cookies.remove('authenticatedUser');
   }
@@ -65,27 +74,18 @@ export class Provider extends React.Component {
   signUp = async (user) => {
     const response = await this.data.createUser(JSON.stringify(user));
     if (response.status === 201) {
+      // sign in user after signup
       this.signIn(user.emailAddress, user.password);
     }
     else if (response.status === 400) {
       return response;
     }
-    // if (response !== null) {
-    //   this.setState(() => {
-    //     return {
-    //       authenticatedUser: JSON.parse(response),
-    //     };
-    //   });
-    //   const cookieOptions = {
-    //     expires: 1 // 1 day
-    //   };
-    //   Cookies.set('authenticatedUser', JSON.parse(response), cookieOptions);
-    // }
-    // return response;
   }
 
   createCourse = async (course) => {
+    // get current user
     const user = this.state.authenticatedUser;
+    // add userId to course
     course.userId = user.id;
     const response = await this.data.createCourse(JSON.stringify(course), user.emailAddress, user.password);
     return response;
@@ -98,15 +98,6 @@ export class Provider extends React.Component {
     return response;
   }
 
-  // deleteCourse = async (id) => {
-  //   this.setState(() => { return { deleting: true } });
-  //   const { emailAddress, password } = this.state.authenticatedUser;
-  //   const response = await this.data.deleteCourse(id, emailAddress, password);
-
-  //   this.setState(() => { return { deleting: false} });
-  // }
-
-
 }
 
 export const Consumer = Context.Consumer;
@@ -114,8 +105,6 @@ export const Consumer = Context.Consumer;
 /**
  * From teamtreehouse.com curriculum file:
  * A higher-order component that wraps the provided component in a Context Consumer component.
- * @param {class} Component - A React component.
- * @returns {function} A higher-order component.
  */
 
 export default function withContext(Component) {

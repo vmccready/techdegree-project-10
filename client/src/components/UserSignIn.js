@@ -1,10 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-
-
 export default class UserSignIn extends React.Component {
 
+  // initalize state and values
   state = {
     emailAddress: '',
     password: '',
@@ -25,6 +24,14 @@ export default class UserSignIn extends React.Component {
             <div className="grid-33 centered signin">
               <h1>Sign In</h1>
               <div>
+                {/* Show validation errors if any */}
+                { (this.state.errors?.length > 0) &&
+                  <div className="validation-errors">
+                    <ul>
+                      {this.state.errors.map((error, i)=> <li key={i}>{error}</li>)}
+                    </ul>
+                  </div>
+                }
                 <form onSubmit={this.handleSubmit}>
                   <div><input 
                           id="emailAddress" 
@@ -61,8 +68,7 @@ export default class UserSignIn extends React.Component {
     const { password } = this.state;
     const username = this.state.emailAddress;
 
-    console.log(username);
-    console.log(password);
+    // use context signin function
     context.actions.signIn(username, password)
       .then((user) => {
         if (user === null) {
@@ -81,6 +87,7 @@ export default class UserSignIn extends React.Component {
 
   };
 
+  // change values on user input
   change = (event) => { 
     const name = event.target.name;
     const value = event.target.value;

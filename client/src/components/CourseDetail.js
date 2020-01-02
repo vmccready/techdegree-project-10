@@ -18,8 +18,6 @@ export default class CourseDetail extends React.Component {
   }
 
   async componentDidMount() {
-    // get id from url
-    // const id = this.props.match.params.id;
     // fetch data from database
     const courseDetail = await this.data.getCourseDetail(this.id);
     if (courseDetail !== null) {
@@ -39,6 +37,7 @@ export default class CourseDetail extends React.Component {
   
   deleteCourse = async () => {
     const user = this.props.context.authenticatedUser;
+    // wait for delete before loading all courses
     await this.data.deleteCourse(this.id, user.emailAddress, user.password )
     this.props.history.push('/');
   }
@@ -55,7 +54,8 @@ export default class CourseDetail extends React.Component {
             <div className="actions--bar">
               <div className="bounds">
 
-                <div className="grid-100">                
+                <div className="grid-100">        
+                {/* only show update and delete if user is course owner */}
                 { this.state.isCourseOwner && 
                   <span>
                     <Link className="button" to={`/courses/${courseDetail.id}/update`}>Update Course</Link>

@@ -3,6 +3,7 @@ import Data from '../Data';
 
 export default class UpdateCourse extends React.Component {
 
+  // initialize state and form data
   state = {
     title: "",
     description: "",
@@ -10,12 +11,15 @@ export default class UpdateCourse extends React.Component {
     materialsNeeded: "",
     courseId: "",
     errors: [],
+    user: {
+      firstName: '',
+      lastName: '',
+    }, 
     loading: true
   };
 
   constructor(props) {
     super(props);
-    // this.props.context.actions.getCourseDetail(props.match.params.id);
     this.data = new Data();
   }
 
@@ -32,6 +36,7 @@ export default class UpdateCourse extends React.Component {
           estimatedTime: courseDetail.estimatedTime,
           materialsNeeded: courseDetail.materialsNeeded,
           courseId: courseDetail.id,
+          user: courseDetail.User,
           loading:false
         };
       });
@@ -40,12 +45,15 @@ export default class UpdateCourse extends React.Component {
   
 
   render() {
-    const { title, description, estimatedTime, materialsNeeded } = this.state;
+    // get values from state
+
+    const { title, description, estimatedTime, materialsNeeded, user } = this.state;
 
     return(
       <div className="bounds course--detail">
         <h1>Update Course</h1>
         <div>
+          {/* Show validation errors */}
           { (this.state.errors?.length > 0) &&
             <div>
               <h2 className="validation--errors--label">Validation errors</h2>
@@ -60,7 +68,6 @@ export default class UpdateCourse extends React.Component {
             <div className="grid-66">
               <div className="course--header">
                 <h4 className="course--label">Course</h4>
-                {/* Update value value and placeholder to current values */}
                 <div><input 
                     id="title" 
                     name="title" 
@@ -69,7 +76,7 @@ export default class UpdateCourse extends React.Component {
                     value={title}
                     onChange={this.change}
                     placeholder="Course title..." /></div>
-                <p>By Joe Smith</p>
+              <p>{`By ${user.firstName} ${user.lastName}`}</p>
               </div>
               <div className="course--description">
                 <div><textarea 
@@ -123,16 +130,20 @@ export default class UpdateCourse extends React.Component {
     event.preventDefault();
     const { context } = this.props;
 
+    // get new values
     const { title, description, estimatedTime, materialsNeeded } = this.state;
     const course = {title, description, estimatedTime, materialsNeeded};
     const id = this.state.courseId;
 
+    // send update to context
     context.actions.updateCourse(id, course)
       .then( (response) => {
         if(response.status === 204) {
+          // load course detail if success
           this.props.history.push(`/course/${this.props.match.params.id}`);
         } 
         else if (response.status === 400) {
+          // load validation errors
           response.json().then(data => {
             this.setState(() => {
               return {errors: data.message }
@@ -147,12 +158,13 @@ export default class UpdateCourse extends React.Component {
   };
 
   handleCancel = (event) => {
-    //don't submit and reload page
+    //reroute to course detail
     event.preventDefault();
     this.props.history.push(`/course/${this.props.match.params.id}`)
 
   };
 
+  // change values when user inputs values in fields
   change = (event) => { 
     const name = event.target.name;
     const value = event.target.value;
